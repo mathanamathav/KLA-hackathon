@@ -1,4 +1,5 @@
 import yaml
+import time
 import datetime
 import threading
 from yaml.loader import SafeLoader
@@ -7,7 +8,7 @@ class Kla_framework:
         self.output = []
     def list_outputfile(self,data):
 
-        textfile = open("Milestone1A_Log.txt", "w")
+        textfile = open("Milestone1B.txt", "w")
         for element in data:
             textfile.write(element + "\n")
         textfile.close()
@@ -18,19 +19,22 @@ class Kla_framework:
         for val in dic:
             if dic[val]["Type"] == "Task":
                 entry = dic[val]
-                temp = str(datetime.datetime.now())+";"+name+first[0]+"."+str(val)+" Entry"
+                temp = str(datetime.datetime.now())+";"+first[0]+"."+name+str(val)+" Entry"
                 self.output.append(temp)
                 parameters = "("
                 for index,par in enumerate(entry["Inputs"]):
+                    if par == "ExecutionTime":
+                        print(int(entry["Inputs"]["ExecutionTime"]))
+                        time.sleep(int(entry["Inputs"]["ExecutionTime"]))
                     if index == len(entry["Inputs"])-1:
                         parameters += str(entry["Inputs"][par])+")"    
                         break
                     parameters += str(entry["Inputs"][par])+","
                     
-                temp = str(datetime.datetime.now())+";"+name+first[0]+"."+str(val)+" Executing "+str(entry["Function"])+" "+parameters
+                temp = str(datetime.datetime.now())+";"+first[0]+"."+name+str(val)+" Executing "+str(entry["Function"])+" "+parameters
                 self.output.append(temp)
 
-                temp = str(datetime.datetime.now())+";"+name+first[0]+"."+str(val)+" Exit"
+                temp = str(datetime.datetime.now())+";"+first[0]+"."+name+str(val)+" Exit"
                 self.output.append(temp)
 
 
@@ -52,11 +56,14 @@ class Kla_framework:
 
                     parameters = "("
                     for index,par in enumerate(entry["Inputs"]):
+                
+                        if par == "ExecutionTime":
+                            time.sleep(int(entry["Inputs"]["ExecutionTime"]))
                         if index == len(entry["Inputs"])-1:
                             parameters += str(entry["Inputs"][par])+")"    
                             break
                         parameters += str(entry["Inputs"][par])+","
-                        
+                    
                     temp = str(datetime.datetime.now())+";"+name+first[0]+"."+str(val)+" Executing "+str(entry["Function"])+" "+parameters
                     self.output.append(temp)
 
@@ -71,7 +78,6 @@ class Kla_framework:
             threads = []
             length = len(data[first[0]]["Activities"])
             for val in data[first[0]]["Activities"]:
-        
                 t = threading.Thread(target=self.concurrent_task, args=[str(first[0])+".",{val : data[first[0]]["Activities"][val]}])
                 t.start()
                 threads.append(t)
@@ -90,13 +96,12 @@ if __name__ == "__main__":
     # obj = Kla_framework()
     # obj.logpraser("",data)
     
-    with open('Milestone1\Milestone1A.yaml') as f:
+    # with open('Milestone1\Milestone1A.yaml') as f:
+    #     data = yaml.load(f, Loader=SafeLoader)
+    # obj = Kla_framework()
+    
+
+    with open('Milestone1\Milestone1B.yaml') as f:
         data = yaml.load(f, Loader=SafeLoader)
     obj = Kla_framework()
     obj.logpraser("",data)
-
-    # with open('Milestone1\Milestone1B.yaml') as f:
-    #     data = yaml.load(f, Loader=SafeLoader)
-    # obj = Kla_framework()
-    # obj.logpraser("",data)
-     
