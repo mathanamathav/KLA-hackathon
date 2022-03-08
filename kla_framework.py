@@ -36,6 +36,9 @@ class Kla_framework:
 
                 temp = str(datetime.datetime.now())+";"+first[0]+"."+name+str(val)+" Exit"
                 self.output.append(temp)
+            if dic[val]["Type"] == "Flow":
+                self.logpraser(first[0]+"."+name,dic)
+
 
 
     def logpraser(self,name,data):
