@@ -10,13 +10,11 @@ class Kla_framework:
         self.datastructure = {}
 
     def list_outputfile(self,data):
-
-        textfile = open("Milestone2A.txt", "w")
+        textfile = open("Milestone2B.txt", "w")
         for element in data:
             textfile.write(element + "\n")
         textfile.close()
 
-    
     def timefunction(self,t):
         time.sleep(t)
 
@@ -25,22 +23,20 @@ class Kla_framework:
         df = pd.read_csv(basepath+datafile)
         self.datastructure[name+".NoOfDefect"] = len(df)
 
-    def concurrent_task(self,name,dic):
+    def concurrent_task(self,lock,name,dic):
+        lock.acquire()
+
         first = list(data)
 
         for val in dic:
             if dic[val]["Type"] == "Task":
                 entry = dic[val]
-
                 temp = str(datetime.datetime.now())+";"+first[0]+"."+name+str(val)+" Entry"
                 self.output.append(temp)
 
                 if dic[val]["Function"] == "DataLoad":
                     print(entry)
                     self.dataload(entry["Inputs"]["Filename"],name+first[0]+"."+str(val))
-                    # temp = str(datetime.datetime.now())+";"+first[0]+"."+name+str(val)+" DataLoad"+"("+entry["Inputs"]["Filename"]+")"
-                    # self.output.append(temp)
-
 
                 if entry.get("Condition",0) != 0:
                     temp = entry["Condition"]
@@ -48,33 +44,31 @@ class Kla_framework:
                         temp = temp.split(" ")
                         q = temp[0]
                         q = q[2:-2]
-                    
                         if self.datastructure.get(q,0) != 0:
                             if temp[1] == ">": 
                                 if self.datastructure[q] > int(temp[2]):
+
                                     temp = str(datetime.datetime.now())+";"+first[0]+"."+name+str(val)+" Skipped"
                                     self.output.append(temp)
                                     temp = str(datetime.datetime.now())+";"+first[0]+"."+name+str(val)+" Exit"
                                     self.output.append(temp)
                                     continue
+
                             elif temp[1] == "<": 
                                 if self.datastructure[q] < int(temp[2]):
+                                    
                                     temp = str(datetime.datetime.now())+";"+first[0]+"."+name+str(val)+" Skipped"
                                     self.output(temp)
                                     temp = str(datetime.datetime.now())+";"+first[0]+"."+name+str(val)+" Exit"
                                     self.output.append(temp)
                                     continue
                             
-                
-                
                 parameters = "("
                 for index,par in enumerate(entry["Inputs"]):
                     
                     if par == "ExecutionTime":
                         self.timefunction(int(entry["Inputs"]["ExecutionTime"]))
 
-                        # print(int(entry["Inputs"]["ExecutionTime"]))
-                        # time.sleep(int(entry["Inputs"]["ExecutionTime"]))
                     if index == len(entry["Inputs"])-1:
                         parameters += str(entry["Inputs"][par])+")"    
                         break
@@ -96,10 +90,11 @@ class Kla_framework:
                 temp = str(datetime.datetime.now())+";"+first[0]+"."+name+str(val)+" Exit"
                 self.output.append(temp)
             
+            lock.release()
             if dic[val]["Type"] == "Flow":
                 name = first[0]+"."+name
                 self.logpraser(name,dic)
-
+            
 
 
     def logpraser(self,name,data):
@@ -116,7 +111,6 @@ class Kla_framework:
                     
                     
                     entry = dic[val]
-                    
                     temp = str(datetime.datetime.now())+";"+name+first[0]+"."+str(val)+" Entry"
                     self.output.append(temp)
                     
@@ -154,7 +148,6 @@ class Kla_framework:
                     for index,par in enumerate(entry["Inputs"]):
                         
                         if par == "ExecutionTime":
-                            # time.sleep(int(entry["Inputs"]["ExecutionTime"]))
                             self.timefunction(int(entry["Inputs"]["ExecutionTime"]))
                         
                         if index == len(entry["Inputs"])-1:
@@ -188,15 +181,18 @@ class Kla_framework:
             threads = []
             
             for val in data[first[0]]["Activities"]:
-                t = threading.Thread(target=self.concurrent_task, args=[str(first[0])+".",{val : data[first[0]]["Activities"][val]}])
+                lock = threading.Lock()
+                t = threading.Thread(target=self.concurrent_task, args=[lock,str(first[0])+".",{val : data[first[0]]["Activities"][val]}])
                 t.start()
                 threads.append(t)
+                
         
             for thread in threads:
                 thread.join()
 
         val = str(datetime.datetime.now())+";"+name+first[0]+" Exit"
         self.output.append(val)
+
         print(self.datastructure)
         self.list_outputfile(self.output)
 
@@ -211,7 +207,7 @@ if __name__ == "__main__":
     #     data = yaml.load(f, Loader=SafeLoader)
     # obj = Kla_framework()
     
-    with open('Milestone2\Milestone2A.yaml') as f:
+    with open('Milestone2\Milestone2B.yaml') as f:
         data = yaml.load(f, Loader=SafeLoader)
     obj = Kla_framework()
     obj.logpraser("",data)
