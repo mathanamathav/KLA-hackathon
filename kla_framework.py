@@ -7,14 +7,14 @@ class Kla_framework:
         self.output = []
     def list_outputfile(self,data):
 
-        textfile = open("Milestone1A_Log.txt", "w")
+        textfile = open("Milestone1B_Log.txt", "w")
         for element in data:
             textfile.write(element + "\n")
         textfile.close()
 
     def concurrent_task(self,name,dic):
         first = list(data)
-        print(dic)
+        # print(dic)
         for val in dic:
             if dic[val]["Type"] == "Task":
                 entry = dic[val]
@@ -33,7 +33,6 @@ class Kla_framework:
                 temp = str(datetime.datetime.now())+";"+name+first[0]+"."+str(val)+" Exit"
                 self.output.append(temp)
 
-        print(data)
 
     def logpraser(self,name,data):
         # print(data)
@@ -69,12 +68,11 @@ class Kla_framework:
 
         elif data[first[0]]["Execution"] == "Concurrent":
             temp = data[first[0]]["Activities"]
-            print({first[0] :data[first[0]]["Activities"]})
             threads = []
             length = len(data[first[0]]["Activities"])
             for val in data[first[0]]["Activities"]:
-                print(data[first[0]]["Activities"][val])
-                t = threading.Thread(target=self.concurrent_task, args=[str(first[0])+".",data[first[0]]["Activities"][val]])
+        
+                t = threading.Thread(target=self.concurrent_task, args=[str(first[0])+".",{val : data[first[0]]["Activities"][val]}])
                 t.start()
                 threads.append(t)
             # for _ in range(length):
@@ -90,8 +88,19 @@ class Kla_framework:
         self.list_outputfile(self.output)
 
 if __name__ == "__main__":
-    with open('Examples\Milestone1\Milestone1_Example.yaml') as f:
-        data = yaml.load(f, Loader=SafeLoader)
+    # with open('Examples\Milestone1\Milestone1_Example.yaml') as f:
+    #     data = yaml.load(f, Loader=SafeLoader)
     
+    # obj = Kla_framework()
+    # obj.logpraser("",data)
+    
+    with open('Milestone1\Milestone1A.yaml') as f:
+        data = yaml.load(f, Loader=SafeLoader)
     obj = Kla_framework()
-    obj.logpraser("",data) 
+    obj.logpraser("",data)
+
+    # with open('Milestone1\Milestone1B.yaml') as f:
+    #     data = yaml.load(f, Loader=SafeLoader)
+    # obj = Kla_framework()
+    # obj.logpraser("",data)
+     
