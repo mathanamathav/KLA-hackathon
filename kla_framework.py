@@ -7,7 +7,7 @@ class Kla_framework:
         self.output = []
     def list_outputfile(self,data):
 
-        textfile = open("Milestone1B_Log.txt", "w")
+        textfile = open("Milestone1A_Log.txt", "w")
         for element in data:
             textfile.write(element + "\n")
         textfile.close()
@@ -35,8 +35,7 @@ class Kla_framework:
 
 
     def logpraser(self,name,data):
-        # print(data)
-        # print(" ")
+    
         first = list(data)
         val = str(datetime.datetime.now())+";"+name+first[0]+" Entry"
         self.output.append(val)
@@ -50,6 +49,7 @@ class Kla_framework:
 
                     temp = str(datetime.datetime.now())+";"+name+first[0]+"."+str(val)+" Entry"
                     self.output.append(temp)
+
                     parameters = "("
                     for index,par in enumerate(entry["Inputs"]):
                         if index == len(entry["Inputs"])-1:
@@ -75,15 +75,11 @@ class Kla_framework:
                 t = threading.Thread(target=self.concurrent_task, args=[str(first[0])+".",{val : data[first[0]]["Activities"][val]}])
                 t.start()
                 threads.append(t)
-            # for _ in range(length):
-            #     t = threading.Thread(target=self.concurrent_task, args=[str(first[0])+".",{first[0] :data[first[0]]}])
-            #     t.start()
-            #     threads.append(t)
-
+        
             for thread in threads:
                 thread.join()
-            return 
-        val = str(datetime.datetime.now())+";"+first[0]+" Exit"
+
+        val = str(datetime.datetime.now())+";"+name+first[0]+" Exit"
         self.output.append(val)
         self.list_outputfile(self.output)
 
