@@ -24,11 +24,12 @@ class Kla_framework:
         self.datastructure[name+".NoOfDefect"] = len(df)
 
     def concurrent_task(self,lock,name,dic):
-        lock.acquire()
+        
 
         first = list(data)
 
         for val in dic:
+            lock.acquire()
             if dic[val]["Type"] == "Task":
                 entry = dic[val]
                 temp = str(datetime.datetime.now())+";"+first[0]+"."+name+str(val)+" Entry"
@@ -89,16 +90,16 @@ class Kla_framework:
 
                 temp = str(datetime.datetime.now())+";"+first[0]+"."+name+str(val)+" Exit"
                 self.output.append(temp)
-            
-            lock.release()
+                
+                lock.release()
             if dic[val]["Type"] == "Flow":
                 name = first[0]+"."+name
                 self.logpraser(name,dic)
             
 
-
     def logpraser(self,name,data):
-        dataloadflag = False
+        print(data)
+        print(" ")
         first = list(data)
         val = str(datetime.datetime.now())+";"+name+first[0]+" Entry"
         self.output.append(val)
@@ -108,8 +109,6 @@ class Kla_framework:
             for val in dic:
     
                 if dic[val]["Type"] == "Task":
-                    
-                    
                     entry = dic[val]
                     temp = str(datetime.datetime.now())+";"+name+first[0]+"."+str(val)+" Entry"
                     self.output.append(temp)
